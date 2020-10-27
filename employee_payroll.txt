@@ -157,3 +157,287 @@ mysql> select gender, count(name) from employee_payroll group by gender;
 | F      |           1 |
 +--------+-------------+
 2 rows in set (0.00 sec)
+
+
+
+mysql> select * from employee_payroll;
++----+---------+--------+--------+------------+
+| id | name    | gender | salary | start      |
++----+---------+--------+--------+------------+
+|  1 | Bill    | M      | 100000 | 2018-01-03 |
+|  2 | Terisa  | F      | 200000 | 2019-11-13 |
+|  3 | Charlie | M      | 300000 | 2020-05-21 |
++----+---------+--------+--------+------------+
+3 rows in set (0.00 sec)
+
+mysql> alter table employee_payroll add phone_number varchar(250) after name;
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employee_payroll add address varchar(250) after phone_number;
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employee_payroll add department varchar(250) NOT NULL  after address;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> describe employee_payroll;
++--------------+--------------+------+-----+---------+----------------+
+| Field        | Type         | Null | Key | Default | Extra          |
++--------------+--------------+------+-----+---------+----------------+
+| id           | int unsigned | NO   | PRI | NULL    | auto_increment |
+| name         | varchar(150) | NO   |     | NULL    |                |
+| phone_number | varchar(250) | YES  |     | NULL    |                |
+| address      | varchar(250) | YES  |     | NULL    |                |
+| department   | varchar(250) | NO   |     | NULL    |                |
+| gender       | char(1)      | YES  |     | NULL    |                |
+| salary       | double       | NO   |     | NULL    |                |
+| start        | date         | NO   |     | NULL    |                |
++--------------+--------------+------+-----+---------+----------------+
+8 rows in set (0.01 sec)
+
+mysql> alter table employee_payroll rename column salary to basic_pay;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employee_payroll add deductions double NOT NULL  after basic_pay;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employee_payroll add taxable_pay double NOT NULL  after deductions;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employee_payroll add tax double NOT NULL  after taxable_pay;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employee_payroll add net_pay double NOT NULL  after tax;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> describe employee_payroll;
++--------------+--------------+------+-----+---------+----------------+
+| Field        | Type         | Null | Key | Default | Extra          |
++--------------+--------------+------+-----+---------+----------------+
+| id           | int unsigned | NO   | PRI | NULL    | auto_increment |
+| name         | varchar(150) | NO   |     | NULL    |                |
+| phone_number | varchar(250) | YES  |     | NULL    |                |
+| address      | varchar(250) | YES  |     | NULL    |                |
+| department   | varchar(250) | NO   |     | NULL    |                |
+| gender       | char(1)      | YES  |     | NULL    |                |
+| basic_pay    | double       | NO   |     | NULL    |                |
+| deductions   | double       | NO   |     | NULL    |                |
+| taxable_pay  | double       | NO   |     | NULL    |                |
+| tax          | double       | NO   |     | NULL    |                |
+| net_pay      | double       | NO   |     | NULL    |                |
+| start        | date         | NO   |     | NULL    |                |
++--------------+--------------+------+-----+---------+----------------+
+12 rows in set (0.00 sec)
+
+mysql> use payroll_service;
+Database changed
+mysql> select * from employee_service;
+ERROR 1146 (42S02): Table 'payroll_service.employee_service' doesn't exist
+mysql> select * from employee_payroll;
++----+---------+--------------+---------+------------+--------+-----------+------------+-------------+-----+---------+------------+
+| id | name    | phone_number | address | department | gender | basic_pay | deductions | taxable_pay | tax | net_pay | start      |
++----+---------+--------------+---------+------------+--------+-----------+------------+-------------+-----+---------+------------+
+|  1 | Bill    | NULL         | NULL    |            | M      |    100000 |          0 |           0 |   0 |       0 | 2018-01-03 |
+|  2 | Terisa  | NULL         | NULL    |            | F      |    200000 |          0 |           0 |   0 |       0 | 2019-11-13 |
+|  3 | Charlie | NULL         | NULL    |            | M      |    300000 |          0 |           0 |   0 |       0 | 2020-05-21 |
++----+---------+--------------+---------+------------+--------+-----------+------------+-------------+-----+---------+------------+
+3 rows in set (0.02 sec)
+
+mysql> insert into employee_payroll (name,department,gender,basic_pay,deductions,taxable_pay,tax,net_pay,start) values
+    -> ('Terisa','Marketting','F',300000.00,100000.00,200000.00,500000.00,1500000.00,'2018-01-03');
+Query OK, 1 row affected (0.06 sec)
+
+mysql> select * from employee_payroll;
++----+---------+--------------+---------+------------+--------+-----------+------------+-------------+--------+---------+------------+
+| id | name    | phone_number | address | department | gender | basic_pay | deductions | taxable_pay | tax    | net_pay | start      |
++----+---------+--------------+---------+------------+--------+-----------+------------+-------------+--------+---------+------------+
+|  1 | Bill    | NULL         | NULL    |            | M      |    100000 |          0 |           0 |      0 |       0 | 2018-01-03 |
+|  2 | Terisa  | NULL         | NULL    |            | F      |    200000 |          0 |           0 |      0 |       0 | 2019-11-13 |
+|  3 | Charlie | NULL         | NULL    |            | M      |    300000 |          0 |           0 |      0 |       0 | 2020-05-21 |
+|  4 | Terisa  | NULL         | NULL    | Marketting | F      |    300000 |     100000 |      200000 | 500000 | 1500000 | 2018-01-03 |
++----+---------+--------------+---------+------------+--------+-----------+------------+-------------+--------+---------+------------+
+4 rows in set (0.00 sec)
+
+mysql> create table employee (
+    -> id INT unsigned not null auto_increment,
+    -> name varchar(250) not null,
+    -> phone_no varchar(13) not null,
+    -> address varchar(250) not null,
+    -> gender varchar(1) not null,
+    -> primary key (id)
+    -> );
+Query OK, 0 rows affected (0.23 sec)
+
+mysql>  insert into employee (name,phone_no,gender,address) values
+    -> ('Bill','9999999999','M','1234 street'),
+    -> ('Terisa','9999999998','F','12345 street'),
+    -> ('Charlie','9999999997','M','123456 street');
+Query OK, 3 rows affected (0.02 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> select * from employee;
++----+---------+------------+---------------+--------+
+| id | name    | phone_no   | address       | gender |
++----+---------+------------+---------------+--------+
+|  1 | Bill    | 9999999999 | 1234 street   | M      |
+|  2 | Terisa  | 9999999998 | 12345 street  | F      |
+|  3 | Charlie | 9999999997 | 123456 street | M      |
++----+---------+------------+---------------+--------+
+3 rows in set (0.00 sec)
+
+mysql> create table company (
+    -> id INT unsigned not null auto_increment,
+    -> name varchar(250) not null,
+    -> primary key (id)
+    -> );
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> insert into company (name) values
+    -> ('Capgemini');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from company;
++----+-----------+
+| id | name      |
++----+-----------+
+|  1 | Capgemini |
++----+-----------+
+1 row in set (0.00 sec)
+
+mysql> create table department (
+    -> dept_id INT unsigned not null auto_increment,
+    -> dept_name varchar(250) not null,
+    -> primary key (dept_id)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> insert into department (dept_name) values
+    -> ('Sales'),
+    -> ('Marketting');
+Query OK, 2 rows affected (0.01 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select * from department;
++---------+------------+
+| dept_id | dept_name  |
++---------+------------+
+|       1 | Sales      |
+|       2 | Marketting |
++---------+------------+
+2 rows in set (0.00 sec)
+
+mysql> create table payroll (
+    -> id INT unsigned not null,
+    -> start DATE NOT NULL,
+    -> basic_pay double NOT NULL,
+    -> deductions double NOT NULL,
+    -> taxable_pay double NOT NULL,
+    -> tax double NOT NULL,
+    -> net_pay double NOT NULL,
+    -> primary key (id)
+    -> );
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> insert into payroll (id,start,basic_pay,deductions,taxable_pay,tax,net_pay) values
+    -> (1,'2018-01-03',200000.00,100000.00,200000.00,500000.00,1000000.00),
+    -> (2,'2019-11-13',300000.00,100000.00,200000.00,500000.00,1100000.00),
+    -> (3,'2020-05-21',400000.00,100000.00,200000.00,500000.00,1200000.00);
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> create table emp_dept (
+    -> id INT unsigned not null,
+    -> dept_id INT unsigned not null,
+    -> dept_name varchar(250) not null
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> insert into emp_dept (id,dept_id,dept_name) values
+    -> (2,1,'Sales'),
+    -> (2,2,'Marketting');
+Query OK, 2 rows affected (0.01 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select * from company;
++----+-----------+
+| id | name      |
++----+-----------+
+|  1 | Capgemini |
++----+-----------+
+1 row in set (0.00 sec)
+
+mysql> alter table company rename column id to cmp_id;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from company;
++--------+-----------+
+| cmp_id | name      |
++--------+-----------+
+|      1 | Capgemini |
++--------+-----------+
+1 row in set (0.00 sec)
+
+mysql> alter table company rename column name to cmp_name;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from company;
++--------+-----------+
+| cmp_id | cmp_name  |
++--------+-----------+
+|      1 | Capgemini |
++--------+-----------+
+1 row in set (0.00 sec)
+
+mysql> select * from employee;
++----+---------+------------+---------------+--------+
+| id | name    | phone_no   | address       | gender |
++----+---------+------------+---------------+--------+
+|  1 | Bill    | 9999999999 | 1234 street   | M      |
+|  2 | Terisa  | 9999999998 | 12345 street  | F      |
+|  3 | Charlie | 9999999997 | 123456 street | M      |
++----+---------+------------+---------------+--------+
+3 rows in set (0.00 sec)
+
+mysql> select * from payroll;
++----+------------+-----------+------------+-------------+--------+---------+
+| id | start      | basic_pay | deductions | taxable_pay | tax    | net_pay |
++----+------------+-----------+------------+-------------+--------+---------+
+|  1 | 2018-01-03 |    200000 |     100000 |      200000 | 500000 | 1000000 |
+|  2 | 2019-11-13 |    300000 |     100000 |      200000 | 500000 | 1100000 |
+|  3 | 2020-05-21 |    400000 |     100000 |      200000 | 500000 | 1200000 |
++----+------------+-----------+------------+-------------+--------+---------+
+3 rows in set (0.00 sec)
+
+mysql> select * from department;
++---------+------------+
+| dept_id | dept_name  |
++---------+------------+
+|       1 | Sales      |
+|       2 | Marketting |
++---------+------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from emp_dept;
++----+---------+------------+
+| id | dept_id | dept_name  |
++----+---------+------------+
+|  2 |       1 | Sales      |
+|  2 |       2 | Marketting |
++----+---------+------------+
+2 rows in set (0.00 sec)
+
+mysql>
+
+
+
+
+
